@@ -74,3 +74,47 @@ export async function verifyPassword(password: string, stored: string) {
   if (hash.length !== expected.length) return false;
   return timingSafeEqual(hash, expected);
 }
+
+
+
+export type ExamSessionDoc = {
+  examId: string; // also used as the SFU "room" name
+  title: string;
+  teacherName: string;
+  status: "scheduled" | "live" | "ended";
+  createdAt: Date;
+};
+
+const examSessions = db.collection<ExamSessionDoc>("examSessions");
+
+async function getExamSessions() {
+  if (!indexReady) {
+    await examSessions.createIndex({ examId: 1 }, { unique: true });
+    indexReady = true;
+  }
+  return examSessions;
+}
+
+// Look up one exam session by its id. Returns null if it doesn't exist
+export async function getExamSession(examId: string) {
+  const sessions = await getExamSessions();
+  return sessions.findOne({ examId });
+}
+
+// A teacher calls this to open a new exam session
+export async function createExamSession(examId: string, title: string, teacherName: string) {
+  const sessions = await getExamSessions();
+  await sessions.insertOne({
+    examId,
+    title,
+    teacherName,
+    status: "scheduled",
+    createdAt: new Date(),
+  });
+}
+
+// Mark a session as live or ended, e.g. when the teacher starts/stops watching
+export async function setExamSessionStatus(examId: string, status: ExamSessionDoc["status"]) {
+  const sessions = await getExamSessions();
+  await sessions.updateOne({ examId }, { $set: { status } });
+}
