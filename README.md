@@ -1,87 +1,164 @@
-# Welcome to React Router!
+# Manus
 
-A modern, production-ready template for building full-stack React applications using React Router.
+Manus is a React Router + TypeScript demo application for a React Native learning experience. It combines a user registration flow, browser/device API explorations, and a WebRTC peer-to-peer test environment in a single app.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+This project is designed as a learning/demo app for exploring how web apps can request browser permissions and use modern device capabilities such as camera, microphone, geolocation, contacts, Bluetooth, file access, and live communication features.
 
-## Features
+## What the project does
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+- Creates a user account with validation and password hashing
+- Stores accounts in MongoDB
+- Demonstrates browser permission and device API access patterns
+- Includes a local and two-person WebRTC signaling test
+- Provides a structure for exam/session metadata management
 
-## Getting Started
+## Tech stack
 
-### Installation
+- React Router 8
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS
+- MongoDB via MongoDB Node driver
+- WebSocket signaling server for peer calls
 
-Install the dependencies:
+## Project structure
+
+```bash
+manus/
+├── app/
+│   ├── .server/
+│   │   ├── mongo.ts
+│   │   └── session.ts
+│   ├── model/
+│   │   └── database.ts
+│   ├── routes/
+│   │   ├── home.tsx
+│   │   ├── exam.ts
+│   │   ├── exam.teacher.tsx
+│   │   └── api.exam-token.ts
+│   ├── app.css
+│   ├── root.tsx
+│   ├── routes.ts
+│   └── welcome/
+├── public/
+├── .env
+├── Dockerfile
+├── package.json
+├── react-router.config.ts
+├── signaling-server.mjs
+├── tsconfig.json
+├── vite.config.ts
+└── README.md
+```
+
+## Main features
+
+### 1. User registration flow
+
+The landing page includes a form that collects:
+
+- full name
+- email
+- department
+- course
+- password
+
+The form validates input on both the client and server side. Passwords are hashed with Node crypto before being stored, and duplicate email entries are rejected by a unique MongoDB index.
+
+### 2. Browser/device feature demos
+
+The app includes cards that demonstrate browser access to:
+
+- camera and microphone
+- geolocation
+- contacts
+- OTP-related browser APIs
+- Bluetooth
+- file access
+
+These are mostly educational examples and rely on browser permissions and HTTPS/local secure contexts.
+
+### 3. WebRTC peer connection demo
+
+The app includes a two-person WebRTC test flow using a simple signaling server:
+
+- local participant joins a room
+- second participant joins the same room
+- signaling messages exchange SDP and ICE candidates
+- media streams are connected peer-to-peer
+
+The signaling server runs from `signaling-server.mjs` on port `3001`.
+
+### 4. Exam/session metadata
+
+There are exam-related server utilities for managing exam session records. These are used to track session metadata such as exam ID, title, teacher name, and status.
+
+## Prerequisites
+
+- Node.js 22+
+- npm
+- MongoDB connection string
+- A browser that supports the device APIs you want to test
+
+## Environment setup
+
+Create a `.env` file in the project root and add your MongoDB connection string:
+
+```bash
+MONGODB_CONNECTION_STRING="your_mongodb_connection_string"
+```
+
+## Installation
 
 ```bash
 npm install
 ```
 
-### Development
+## Running the app
 
-Start the development server with HMR:
+Start the React Router app:
 
 ```bash
 npm run dev
 ```
 
-Your application will be available at `http://localhost:5173`.
+In another terminal, start the signaling server:
 
-## Building for Production
+```bash
+node signaling-server.mjs
+```
 
-Create a production build:
+Then open:
+
+- app: `http://localhost:5173`
+- signaling server: `ws://localhost:3001`
+
+## Production build
 
 ```bash
 npm run build
 ```
 
-## Deployment
-
-### Docker Deployment
-
-To build and run using Docker:
+To run the production build:
 
 ```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
+npm run start
 ```
 
-The containerized application can be deployed to any platform that supports Docker, including:
+## Docker
 
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
+```bash
+docker build -t manus .
+docker run -p 3000:3000 manus
 ```
 
-## Styling
+## Notes
 
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
+- Some browser APIs require user interaction and secure contexts.
+- Camera, location, contacts, Bluetooth, and file APIs will only work in supported browsers and may require explicit permission.
+- This project is a demo/learning app and not a full production-ready exam platform.
 
----
+## License
 
-Built with ❤️ using React Router.
+This project does not include a custom license file. Please check your repository or organization policy before reusing it in production.
